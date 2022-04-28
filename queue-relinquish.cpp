@@ -18,14 +18,18 @@ std::mutex slock;
 HALON_EXPORT
 bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 {
-	std::lock_guard<std::mutex> lock(slock);
-	for (const auto & skip : skips)
-	{
-		if (!skip.fields)
-			continue;
-		if (skip.ttl < time(nullptr))
-			continue;
+	time_t now = time(nullptr);
 
+	std::lock_guard<std::mutex> lock(slock);
+	for (auto skip = skips.begin(); skip != skips.end(); )
+	{
+		if (skip->ttl < now)
+		{
+			skip = skips.erase(skip);
+			continue;
+		}
+
+		bool match = true;
 		size_t o = 0;
 		for (auto z : {
 				HALONMTA_MESSAGE_TRANSPORTID,
@@ -36,19 +40,25 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 				HALONMTA_MESSAGE_JOBID
 				})
 		{
-			if (skip.fields & (1 << z))
+			if (skip->fields & (1 << z))
 			{
 				char* v;
 				size_t vlen;
 				HalonMTA_message_getinfo(hqm, z, nullptr, 0, &v, &vlen);
-				if (skip.data[o] != std::string(v, vlen))
-					continue;
+				if (skip->data[o] != std::string(v, vlen))
+				{
+					match = false;
+					break;
+				}
 				++o;
-				if (o >= skip.data.size())
+				if (o >= skip->data.size())
 					break;
 			}
 		}
-		return false;
+
+		if (match)
+			return false;
+		++skip;
 	}
 	return true;
 }
