@@ -66,6 +66,8 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 void queue_pickup_cancel(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)
 {
 	HalonHSLValue* arg = HalonMTA_hsl_argument_get(args, 0);
+	if (!arg)
+		return;
 
 	size_t index = 0;
 	HalonHSLValue *k, *v;
@@ -113,6 +115,9 @@ void queue_pickup_cancel(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSL
 	HalonMTA_hsl_value_set(ret, HALONMTA_HSL_TYPE_STRING, "key", 0);
 
 	HalonHSLValue* arg2 = HalonMTA_hsl_argument_get(args, 1);
+	if (!arg2)
+		return;
+
 	double ttl;
 	HalonMTA_hsl_value_get(arg2, HALONMTA_HSL_TYPE_NUMBER, &ttl, nullptr);
 
