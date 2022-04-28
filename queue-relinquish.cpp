@@ -1,9 +1,8 @@
-#include "smtpd/HalonMTA.h"
+#include <HalonMTA.h>
 #include <map>
 #include <string>
 #include <vector>
 #include <list>
-#include <syslog.h>
 #include <time.h>
 #include <mutex>
 
@@ -19,7 +18,6 @@ std::mutex slock;
 HALON_EXPORT
 bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 {
-	syslog(LOG_INFO, "running pickup aquire..");
 	std::lock_guard<std::mutex> lock(slock);
 	for (const auto & skip : skips)
 	{
@@ -50,10 +48,8 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 					break;
 			}
 		}
-		syslog(LOG_INFO, "running pickup aquire.. false");
 		return false;
 	}
-	syslog(LOG_INFO, "running pickup aquire.. true");
 	return true;
 }
 
