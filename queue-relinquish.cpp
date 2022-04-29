@@ -63,7 +63,7 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 	return true;
 }
 
-void queue_pickup_cancel(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)
+void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)
 {
 	HalonHSLValue* arg = HalonMTA_hsl_argument_get(args, 0);
 	if (!arg)
@@ -161,6 +161,6 @@ int Halon_version()
 HALON_EXPORT
 bool Halon_hsl_register(HalonHSLRegisterContext* hhrc)
 {
-	HalonMTA_hsl_register_function(hhrc, "queue_pickup_cancel", queue_pickup_cancel);
+	HalonMTA_hsl_register_function(hhrc, "queue_relinquish", queue_relinquish);
 	return true;
 }
