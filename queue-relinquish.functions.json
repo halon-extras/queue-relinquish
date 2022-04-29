@@ -1,0 +1,22 @@
+[
+    {
+        "name": "queue_relinquish",
+        "parameters": {
+            "required": [
+                {
+                    "name": "fields",
+                    "type": "array"
+                },
+                {
+                    "name": "ttl",
+                    "type": "number"
+                }
+            ]
+        },
+        "returnType": "boolean or none",
+        "detail": "queue_relinquish(array fields, number ttl[, array options]): string or none",
+        "value": "queue_relinquish($0, $1)",
+        "documentation": "Log data to a log file based on its ID.",
+        "link": "[Full documentation](https://github.com/halon-extras/queue-relinquish)"
+    }
+]
