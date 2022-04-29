@@ -66,8 +66,23 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)
 {
 	HalonHSLValue* arg = HalonMTA_hsl_argument_get(args, 0);
-	if (!arg)
+	if (!arg || HalonMTA_hsl_value_type(arg) != HALONMTA_HSL_TYPE_ARRAY)
+	{
+		HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+		HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "Bad or missing fields argument", 0);
 		return;
+	}
+
+	HalonHSLValue* arg2 = HalonMTA_hsl_argument_get(args, 1);
+	if (!arg2 || HalonMTA_hsl_value_type(arg2) != HALONMTA_HSL_TYPE_NUMBER)
+	{
+		HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+		HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "Bad or missing ttl argument", 0);
+		return;
+	}
+
+	double ttl;
+	HalonMTA_hsl_value_get(arg2, HALONMTA_HSL_TYPE_NUMBER, &ttl, nullptr);
 
 	size_t index = 0;
 	HalonHSLValue *k, *v;
@@ -75,6 +90,19 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 	skip s;
 	while ((v = HalonMTA_hsl_value_array_get(arg, index, &k)))
 	{
+		if (HalonMTA_hsl_value_type(k) != HALONMTA_HSL_TYPE_STRING)
+		{
+			HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+			HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "fields[] key is not a string", 0);
+			return;
+		}
+		if (HalonMTA_hsl_value_type(v) != HALONMTA_HSL_TYPE_STRING)
+		{
+			HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+			HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "fields[] calue is not a string", 0);
+			return;
+		}
+
 		char *string, *stringv;
 		size_t stringl, stringvl;
 		HalonMTA_hsl_value_get(k, HALONMTA_HSL_TYPE_STRING, &string, &stringl);
@@ -84,55 +112,64 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 			s.fields |= 1 << HALONMTA_MESSAGE_TRANSPORTID;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
-		if (std::string(string, stringl) == "localip")
+		else if (std::string(string, stringl) == "localip")
 		{
 			s.fields |= 1 << HALONMTA_MESSAGE_LOCALIP;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
-		if (std::string(string, stringl) == "remoteip")
+		else if (std::string(string, stringl) == "remoteip")
 		{
 			s.fields |= 1 << HALONMTA_MESSAGE_REMOTEIP;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
-		if (std::string(string, stringl) == "remotemx")
+		else if (std::string(string, stringl) == "remotemx")
 		{
 			s.fields |= 1 << HALONMTA_MESSAGE_REMOTEMX;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
-		if (std::string(string, stringl) == "recipientdomain")
+		else if (std::string(string, stringl) == "recipientdomain")
 		{
 			s.fields |= 1 << HALONMTA_MESSAGE_RECIPIENTDOMAIN;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
-		if (std::string(string, stringl) == "jobid")
+		else if (std::string(string, stringl) == "jobid")
 		{
 			s.fields |= 1 << HALONMTA_MESSAGE_JOBID;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
+		else
+		{
+			HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+			HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "Unknown field type", 0);
+			return;
+		}
 		++index;
 	}
 
-	HalonMTA_hsl_value_set(ret, HALONMTA_HSL_TYPE_STRING, "key", 0);
-
-	HalonHSLValue* arg2 = HalonMTA_hsl_argument_get(args, 1);
-	if (!arg2)
-		return;
-
-	double ttl;
-	HalonMTA_hsl_value_get(arg2, HALONMTA_HSL_TYPE_NUMBER, &ttl, nullptr);
-
 	HalonHSLValue* arg3 = HalonMTA_hsl_argument_get(args, 2);
 	bool update = true;
-	if (arg3)
+	if (arg3 && HalonMTA_hsl_value_type(arg3) == HALONMTA_HSL_TYPE_ARRAY)
 	{
 		while ((v = HalonMTA_hsl_value_array_get(arg3, index, &k)))
 		{
+			if (HalonMTA_hsl_value_type(k) != HALONMTA_HSL_TYPE_STRING)
+			{
+				HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+				HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "options[] key is not a string", 0);
+				return;
+			}
 			char *string;
 			size_t stringl;
 			HalonMTA_hsl_value_get(k, HALONMTA_HSL_TYPE_STRING, &string, &stringl);
 			if (std::string(string, stringl) == "update")
 			{
 				HalonMTA_hsl_value_get(v, HALONMTA_HSL_TYPE_BOOLEAN, &update, nullptr);
+			}
+			else
+			{
+				HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+				HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "Unknown option", 0);
+				return;
 			}
 			++index;
 		}
