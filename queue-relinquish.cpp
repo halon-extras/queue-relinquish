@@ -99,7 +99,7 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 		if (HalonMTA_hsl_value_type(v) != HALONMTA_HSL_TYPE_STRING)
 		{
 			HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
-			HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "fields[] calue is not a string", 0);
+			HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "fields[] value is not a string", 0);
 			return;
 		}
 
