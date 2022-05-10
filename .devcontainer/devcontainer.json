@@ -1,0 +1,16 @@
+
+{
+	"name": "queue-relinquish",
+	"dockerComposeFile": [
+		"docker-compose.yaml"
+	],
+	"workspaceFolder": "/queue-relinquish",
+	"service": "halon-smtpd",
+	"overrideCommand": false,
+	"extensions": [
+		"Halon.vscode-halon",
+		"Halon.hsl-linter",
+		"Halon.hsl-debug",
+		"ms-vscode.cpptools"
+	]
+}
