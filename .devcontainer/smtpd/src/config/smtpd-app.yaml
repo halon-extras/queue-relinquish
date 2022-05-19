@@ -2,6 +2,9 @@ version: "5.8"
 servers:
   - id: default
     transport: mx
+    phases:
+      eod:
+        hook: default
 transportgroups:
   - id: default
     retry:
