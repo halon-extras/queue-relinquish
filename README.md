@@ -51,7 +51,7 @@ An array of the currently enabled queue relinquish items.
 **Example**
 
 ```
-queue_relinquish();
+queue_relinquish_enabled();
 /*
 [
     ["localip" => "192.168.0.1", "remotemx" => "mx1.example.com"],
