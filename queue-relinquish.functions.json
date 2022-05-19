@@ -18,5 +18,13 @@
         "value": "queue_relinquish($0)",
         "documentation": "Relinquish delivery of mail when picked up from the active queue.",
         "link": "[Full documentation](https://github.com/halon-extras/queue-relinquish)"
+    },
+    {
+        "name": "queue_relinquish_enabled",
+        "returnType": "array",
+        "detail": "queue_relinquish_enabled(): array",
+        "value": "queue_relinquish_enabled()",
+        "documentation": "Get the currently enabled queue relinquish items.",
+        "link": "[Full documentation](https://github.com/halon-extras/queue-relinquish)"
     }
 ]

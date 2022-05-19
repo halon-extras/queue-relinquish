@@ -189,6 +189,74 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 	skips.push_back(s);
 }
 
+void queue_relinquish_enabled(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLValue* ret)
+{
+	HalonMTA_hsl_value_set(ret, HALONMTA_HSL_TYPE_ARRAY, nullptr, 0);
+
+	time_t now = time(nullptr);
+
+	std::lock_guard<std::mutex> lock(slock);
+	for (auto skip = skips.begin(); skip != skips.end(); )
+	{
+		if (skip->ttl < now)
+		{
+			skip = skips.erase(skip);
+			continue;
+		}
+
+		double i = std::distance(skips.begin(), skip);
+
+		HalonHSLValue *k, *v;
+		HalonMTA_hsl_value_array_add(ret, &k, &v);
+		HalonMTA_hsl_value_set(k, HALONMTA_HSL_TYPE_NUMBER, (void*)&i, 0);
+
+		size_t o = 0;
+		for (auto z : {
+				HALONMTA_MESSAGE_TRANSPORTID,
+				HALONMTA_MESSAGE_LOCALIP,
+				HALONMTA_MESSAGE_REMOTEIP,
+				HALONMTA_MESSAGE_REMOTEMX,
+				HALONMTA_MESSAGE_RECIPIENTDOMAIN,
+				HALONMTA_MESSAGE_JOBID
+				})
+		{
+			if (skip->fields & (1 << z))
+			{
+				std::string key;
+				switch (z) {
+					case HALONMTA_MESSAGE_TRANSPORTID:
+						key = "transportid";
+						break;
+					case HALONMTA_MESSAGE_LOCALIP:
+						key = "localip";
+						break;
+					case HALONMTA_MESSAGE_REMOTEIP:
+						key = "remoteip";
+						break;
+					case HALONMTA_MESSAGE_REMOTEMX:
+						key = "remotemx";
+						break;
+					case HALONMTA_MESSAGE_RECIPIENTDOMAIN:
+						key = "recipientdomain";
+						break;
+					case HALONMTA_MESSAGE_JOBID:
+						key = "jobid";
+						break;
+				}
+				HalonHSLValue *k2, *v2;
+				HalonMTA_hsl_value_array_add(v, &k2, &v2);
+				HalonMTA_hsl_value_set(k2, HALONMTA_HSL_TYPE_STRING, key.c_str(), 0);
+				HalonMTA_hsl_value_set(v2, HALONMTA_HSL_TYPE_STRING, skip->data[o].c_str(), 0);
+
+				++o;
+				if (o >= skip->data.size())
+					break;
+			}
+		}
+		++skip;
+	}
+}
+
 HALON_EXPORT
 int Halon_version()
 {
@@ -199,5 +267,6 @@ HALON_EXPORT
 bool Halon_hsl_register(HalonHSLRegisterContext* hhrc)
 {
 	HalonMTA_hsl_register_function(hhrc, "queue_relinquish", queue_relinquish);
+	HalonMTA_hsl_register_function(hhrc, "queue_relinquish_enabled", queue_relinquish_enabled);
 	return true;
 }
