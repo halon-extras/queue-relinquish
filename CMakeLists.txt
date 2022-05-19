@@ -47,7 +47,6 @@ ELSE()
 ENDIF()
 
 INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/queue-relinquish.so.link" DESTINATION plugins/autoload/smtpd RENAME queue-relinquish.so)
-INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/queue-relinquish.so.link" DESTINATION plugins/autoload/hsh RENAME queue-relinquish.so)
 
 INSTALL(FILES "LICENSE" DESTINATION share/doc/plugins/queue-relinquish)
 
