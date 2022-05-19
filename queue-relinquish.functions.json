@@ -11,6 +11,12 @@
                     "name": "ttl",
                     "type": "number"
                 }
+            ],
+            "optional": [
+                {
+                    "name": "options",
+                    "type": "array"
+                }
             ]
         },
         "returnType": "none",
