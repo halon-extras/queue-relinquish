@@ -268,5 +268,7 @@ bool Halon_hsl_register(HalonHSLRegisterContext* hhrc)
 {
 	HalonMTA_hsl_register_function(hhrc, "queue_relinquish", queue_relinquish);
 	HalonMTA_hsl_register_function(hhrc, "queue_relinquish_enabled", queue_relinquish_enabled);
+	HalonMTA_hsl_module_register_function(hhrc, "queue_relinquish", queue_relinquish);
+	HalonMTA_hsl_module_register_function(hhrc, "queue_relinquish_enabled", queue_relinquish_enabled);
 	return true;
 }

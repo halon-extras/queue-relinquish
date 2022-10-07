@@ -36,6 +36,7 @@ Nothing is returned.
 **Example**
 
 ```
+import { queue_relinquish } from "extras://queue-relinquish";
 queue_relinquish([
     "localip" => $arguments["attempt"]["connection"]["localip"],
     "remotemx" => $arguments["attempt"]["connection"]["remotemx"]
@@ -51,6 +52,7 @@ An array of the currently enabled queue relinquish items.
 **Example**
 
 ```
+import { queue_relinquish_enabled } from "extras://queue-relinquish";
 queue_relinquish_enabled();
 /*
 [
