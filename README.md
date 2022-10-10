@@ -20,6 +20,8 @@ yum install halon-extras-queue-relinquish
 
 ## Exported functions
 
+These functions needs to be [imported](https://docs.halon.io/hsl/structures.html#import) from the `extras://queue-relinquish` module path.
+
 ### queue_relinquish(fields, ttl [, options])
 
 **Params**
