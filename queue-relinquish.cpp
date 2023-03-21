@@ -37,7 +37,8 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 				HALONMTA_MESSAGE_REMOTEIP,
 				HALONMTA_MESSAGE_REMOTEMX,
 				HALONMTA_MESSAGE_RECIPIENTDOMAIN,
-				HALONMTA_MESSAGE_JOBID
+				HALONMTA_MESSAGE_JOBID,
+				HALONMTA_MESSAGE_GROUPING
 				})
 		{
 			if (skip->fields & (1 << z))
@@ -137,6 +138,11 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 			s.fields |= 1 << HALONMTA_MESSAGE_JOBID;
 			s.data.push_back(std::string(stringv, stringvl));
 		}
+		else if (std::string(string, stringl) == "grouping")
+		{
+			s.fields |= 1 << HALONMTA_MESSAGE_GROUPING;
+			s.data.push_back(std::string(stringv, stringvl));
+		}
 		else
 		{
 			HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
@@ -217,7 +223,8 @@ void queue_relinquish_enabled(HalonHSLContext* hhc, HalonHSLArguments* args, Hal
 				HALONMTA_MESSAGE_REMOTEIP,
 				HALONMTA_MESSAGE_REMOTEMX,
 				HALONMTA_MESSAGE_RECIPIENTDOMAIN,
-				HALONMTA_MESSAGE_JOBID
+				HALONMTA_MESSAGE_JOBID,
+				HALONMTA_MESSAGE_GROUPING
 				})
 		{
 			if (skip->fields & (1 << z))
@@ -241,6 +248,9 @@ void queue_relinquish_enabled(HalonHSLContext* hhc, HalonHSLArguments* args, Hal
 						break;
 					case HALONMTA_MESSAGE_JOBID:
 						key = "jobid";
+						break;
+					case HALONMTA_MESSAGE_GROUPING:
+						key = "grouping";
 						break;
 				}
 				HalonHSLValue *k2, *v2;
