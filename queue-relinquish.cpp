@@ -197,7 +197,7 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 				size_t jsonlen;
 				if (HalonMTA_hsl_value_to_json(v, &json, &jsonlen))
 				{
-					s.return_value = json;
+					s.return_value = std::string(json, jsonlen);
 					free(json);
 				}
 				else
