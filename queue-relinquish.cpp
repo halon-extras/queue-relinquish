@@ -156,6 +156,7 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 	bool update = true;
 	if (arg3 && HalonMTA_hsl_value_type(arg3) == HALONMTA_HSL_TYPE_ARRAY)
 	{
+		index = 0;
 		while ((v = HalonMTA_hsl_value_array_get(arg3, index, &k)))
 		{
 			if (HalonMTA_hsl_value_type(k) != HALONMTA_HSL_TYPE_STRING)
