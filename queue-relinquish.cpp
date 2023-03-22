@@ -5,19 +5,24 @@
 #include <list>
 #include <time.h>
 #include <mutex>
+#include <syslog.h>
 
 struct skip
 {
 	int ttl = 0;
 	int fields = 0;
 	std::vector<std::string> data;
+	std::string return_value;
 };
 std::list<skip> skips;
 std::mutex slock;
 
 HALON_EXPORT
-bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
+bool Halon_queue_pickup_acquire2(HalonQueueContext *hqc)
 {
+	HalonQueueMessage* hqm;
+	HalonMTA_queue_getinfo(hqc, HALONMTA_INFO_MESSAGE, nullptr, 0, (void*)&hqm, nullptr);
+
 	time_t now = time(nullptr);
 
 	std::lock_guard<std::mutex> lock(slock);
@@ -58,7 +63,21 @@ bool Halon_queue_pickup_acquire(HalonQueueMessage *hqm)
 		}
 
 		if (match)
+		{
+			if (!skip->return_value.empty())
+			{
+				HalonHSLValue* value;
+				HalonMTA_queue_getinfo(hqc, HALONMTA_INFO_RETURN, nullptr, 0, &value, nullptr);
+				char* err;
+				size_t errlen;
+				if (!HalonMTA_hsl_value_from_json(value, skip->return_value.c_str(), &err, &errlen))
+				{
+					syslog(LOG_CRIT, "queue-relinquish: Could not parse return value from JSON");
+					free(err);
+				}
+			}
 			return false;
+		}
 		++skip;
 	}
 	return true;
@@ -171,6 +190,23 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 			if (std::string(string, stringl) == "update")
 			{
 				HalonMTA_hsl_value_get(v, HALONMTA_HSL_TYPE_BOOLEAN, &update, nullptr);
+			}
+			else if (std::string(string, stringl) == "return")
+			{
+				char* json;
+				size_t jsonlen;
+				if (HalonMTA_hsl_value_to_json(v, &json, &jsonlen))
+				{
+					s.return_value = json;
+					free(json);
+				}
+				else
+				{
+					HalonHSLValue* e = HalonMTA_hsl_throw(hhc);
+					HalonMTA_hsl_value_set(e, HALONMTA_HSL_TYPE_EXCEPTION, "Could not encode return value to JSON", 0);
+					free(json);
+					return;
+				}
 			}
 			else
 			{

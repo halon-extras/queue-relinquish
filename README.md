@@ -30,6 +30,7 @@ These functions needs to be [imported](https://docs.halon.io/hsl/structures.html
 - ttl `number` the duration in seconds that the fields combination should be enabled for (**required**)
 - options `array` 
     - update `boolean` update the `ttl` if the fields combination already exists (default `true`)
+    - return `any` the return value that can be retreived from the [Pre-delivery](https://docs.halon.io/hsl/predelivery.html) script using `$arguments["queue"]["plugin"]["return"]`
 
 **Returns**
 
