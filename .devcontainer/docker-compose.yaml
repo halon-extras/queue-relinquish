@@ -12,6 +12,3 @@ services:
     volumes:
       - ../:/queue-relinquish
       - ./smtpd/dist:/etc/halon
-      - halon-spool:/var/spool/halon
-volumes:
-  halon-spool:
