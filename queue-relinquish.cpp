@@ -68,8 +68,8 @@ bool Halon_queue_pickup_acquire2(HalonQueueContext *hqc)
 			{
 				HalonHSLValue* value;
 				HalonMTA_queue_getinfo(hqc, HALONMTA_INFO_RETURN, nullptr, 0, &value, nullptr);
-				char* err;
-				size_t errlen;
+				char* err = nullptr;
+				size_t errlen = 0;
 				if (!HalonMTA_hsl_value_from_json(value, skip->return_value.c_str(), &err, &errlen))
 				{
 					syslog(LOG_CRIT, "queue-relinquish: Could not parse return value from JSON");
@@ -193,8 +193,8 @@ void queue_relinquish(HalonHSLContext* hhc, HalonHSLArguments* args, HalonHSLVal
 			}
 			else if (std::string(string, stringl) == "return")
 			{
-				char* json;
-				size_t jsonlen;
+				char* json = nullptr;
+				size_t jsonlen = 0;
 				if (HalonMTA_hsl_value_to_json(v, &json, &jsonlen))
 				{
 					s.return_value = std::string(json, jsonlen);
